@@ -2,7 +2,7 @@ const { Sequelize, DataTypes, Model } = require("sequelize");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
-const sequelize = new Sequelize("postgresql:///knobby", {
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
 
@@ -31,20 +31,27 @@ Users.init(
       },
     },
     password: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(64),
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
     first_name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(64),
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
     last_name: {
+      type: DataTypes.STRING(64),
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
+    },
+    state: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -56,13 +63,6 @@ Users.init(
     text: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
-    },
-    state: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: true,
-      },
     },
   },
   {
@@ -91,8 +91,7 @@ Users.beforeCreate(async (user) => {
   ));
 });
 
-Users.prototype.validatePassword = async (password, existingPassword) => {
-  console.log(password, existingPassword);
+Users.validatePassword = async (password, existingPassword) => {
   return await bcrypt.compare(password, existingPassword);
 };
 

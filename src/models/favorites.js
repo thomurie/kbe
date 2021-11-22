@@ -1,11 +1,8 @@
-const dotenv = require("dotenv");
 const { Sequelize, DataTypes, Model } = require("sequelize");
 const Bikes = require("./bikes");
 const Users = require("./users");
-dotenv.config();
-const dbUrl = process.env.DATABASE_URL;
 
-const sequelize = new Sequelize("postgresql:///knobby", {
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
 
@@ -18,20 +15,20 @@ Favorites.init(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    bike_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Bikes,
-        key: "bike_id",
-      },
-    },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: Users,
         key: "user_id",
+      },
+    },
+    bike_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Bikes,
+        key: "bike_id",
       },
     },
   },

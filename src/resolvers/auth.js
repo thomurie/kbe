@@ -29,12 +29,12 @@ const isBikeUser = combineResolvers(
 const isAuthUser = combineResolvers(
   isAuth,
   async (_, { user_id }, { user }) => {
-    const user = await models.Users.findAll({
+    const userInfo = await models.Users.findAll({
       where: {
         email: user_id,
       },
     });
-    const userId = user[0].dataValues.email;
+    const userId = userInfo[0].dataValues.email;
 
     if (userId !== user.email)
       throw new ForbiddenError("Not Authorized as User");

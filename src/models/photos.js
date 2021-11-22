@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes, Model } = require("sequelize");
 
-const sequelize = new Sequelize("postgresql:///knobby", {
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
 
@@ -13,12 +13,12 @@ Photos.init(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    url: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
     bike_id: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    url: {
+      type: DataTypes.TEXT,
       allowNull: false,
     },
   },

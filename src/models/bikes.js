@@ -1,10 +1,6 @@
-const dotenv = require("dotenv");
 const { Sequelize, DataTypes, Model } = require("sequelize");
 
-dotenv.config();
-const dbUrl = process.env.DATABASE_URL;
-
-const sequelize = new Sequelize("postgresql:///knobby", {
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
 
@@ -25,14 +21,14 @@ Bikes.init(
       },
     },
     make: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(64),
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
     model: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.STRING(64),
       allowNull: false,
       validate: {
         notEmpty: true,
@@ -60,12 +56,12 @@ Bikes.init(
       },
     },
     size: DataTypes.STRING,
+    about: DataTypes.STRING,
     color: DataTypes.STRING,
     wheel_size: DataTypes.STRING,
     suspension: DataTypes.STRING,
     front: DataTypes.INTEGER,
     rear: DataTypes.INTEGER,
-    about: DataTypes.STRING,
     upgrades: DataTypes.STRING,
     is_active: {
       type: DataTypes.BOOLEAN,

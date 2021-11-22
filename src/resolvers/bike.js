@@ -1,8 +1,3 @@
-const {
-  AuthenticationError,
-  UserInputError,
-  ForbiddenError,
-} = require("apollo-server");
 const { combineResolvers } = require("graphql-resolvers");
 const { isAuth, isAuthUser } = require("./auth");
 

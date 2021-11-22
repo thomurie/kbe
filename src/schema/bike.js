@@ -8,47 +8,42 @@ const bikeSchema = gql`
 
   extend type Mutation {
     createListing(
-      user_id: String!
+      user_id: ID!
       make: String!
       model: String!
       year: Int!
       price: Int!
       state: String!
       size: String
+      about: String
       color: String
       wheel_size: String
       suspension: String
       front: Int
       rear: Int
-      about: String
       upgrades: String
     ): Bike!
     updateListing(
-      bike_id: String!
-      user_id: String!
+      bike_id: ID!
       make: String
       model: String
       year: Int
       price: Int
       state: String
       size: String
+      about: String
       color: String
       wheel_size: String
       suspension: String
       front: Int
       rear: Int
-      about: String
       upgrades: String
     ): Bike!
-    deleteListing(
-      bike_id: String!
-      user_id: String!
-      confirmation: Boolean!
-    ): Error!
+    deleteListing(bike_id: ID!, confirmation: Boolean!): Error!
   }
 
   type Bike {
-    bike_id: String!
+    bike_id: ID!
     user_id: User!
     make: String!
     model: String!
@@ -134,12 +129,12 @@ const bikeSchema = gql`
     Green
     Grey
     Orange
-    Other
     Purple
     Red
     Silver
     White
     Yellow
+    Other
   }
 
   enum Suspension {
@@ -150,5 +145,3 @@ const bikeSchema = gql`
 `;
 
 module.exports = bikeSchema;
-
-//     photos: [Photo!]

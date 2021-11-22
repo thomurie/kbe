@@ -2,16 +2,12 @@ const { gql } = require("apollo-server");
 
 const photoSchema = gql`
   extend type Query {
-    photo(photo_id: String!): Photo!
+    photo(photo_id: ID!): Photo!
   }
 
   extend type Mutation {
-    createPhoto(bike_id: String!, user_id: String!, url: String!): Photo!
-    deletePhoto(
-      photo_id: String!
-      user_id: String!
-      confirmation: Boolean!
-    ): Error!
+    createPhoto(bike_id: ID!, url: String!): Photo!
+    deletePhoto(photo_id: ID!, confirmation: Boolean!): Error!
   }
 
   type Photo {
@@ -22,5 +18,3 @@ const photoSchema = gql`
 `;
 
 module.exports = photoSchema;
-
-//     photos: [Photo!]

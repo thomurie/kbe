@@ -4,7 +4,7 @@ const Bikes = require("./bikes");
 const Favorites = require("./favorites");
 const Photos = require("./photos");
 
-const sequelize = new Sequelize("postgresql:///knobby", {
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
 

@@ -1,10 +1,7 @@
 const jwt = require("jsonwebtoken");
-const {
-  AuthenticationError,
-  UserInputError,
-  ForbiddenError,
-} = require("apollo-server");
+const { AuthenticationError, UserInputError } = require("apollo-server");
 const { combineResolvers } = require("graphql-resolvers");
+const { isAuth, isAuthUser } = require("./auth");
 
 const createToken = async (user, secret, expiresIn) => {
   const { email, first_name, last_name } = user;

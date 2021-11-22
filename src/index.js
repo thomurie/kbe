@@ -15,7 +15,7 @@ const validateUser = async (req) => {
 
   if (token) {
     try {
-      return await jwt.verify(toekn, "supersecret");
+      return await jwt.verify(token, "supersecret");
     } catch (error) {
       throw new AuthenticationError("Your session expired. Sign in again.");
     }
@@ -29,7 +29,7 @@ const server = new ApolloServer({
     const user = await validateUser(req);
     return {
       models,
-      secret: "supersecret",
+      secret: process.env.SECRET,
       user,
     };
   },
