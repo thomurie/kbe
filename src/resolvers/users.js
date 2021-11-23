@@ -1,7 +1,11 @@
 const jwt = require("jsonwebtoken");
-const { AuthenticationError, UserInputError } = require("apollo-server");
+const {
+  AuthenticationError,
+  UserInputError,
+  INTERNAL_SERVER_ERROR,
+} = require("apollo-server");
 const { combineResolvers } = require("graphql-resolvers");
-const { isAuth, isAuthUser, isAuthUserArg } = require("./auth");
+const { isAuth, isAuthUser, isAuthUserArg, isFavUser } = require("./auth");
 const { UserNotFoundError } = require("./customError");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -27,6 +31,11 @@ const createToken = async (user, secret, expiresIn) => {
     { expiresIn }
   );
 };
+
+/**
+ * TODO:
+ * WRITE TESTS
+ */
 
 const userResolvers = {
   Query: {
@@ -232,7 +241,7 @@ const userResolvers = {
         }
       }
     ),
-
+    // TODO TEST
     createFavorite: combineResolvers(
       isAuth,
       async (_, { bike_id }, { models, user }) => {
@@ -244,14 +253,16 @@ const userResolvers = {
             message: "Successfully added to Favorites",
           };
         } catch (error) {
-          throw new INTERNAL_SERVER_ERROR(
-            "An unknown error occured, please try your request again"
-          );
+          return {
+            error: true,
+            message: "Failed to add to Favorites",
+          };
         }
       }
     ),
+    // TODO TEST
     deleteFavorite: combineResolvers(
-      isAuth,
+      isFavUser,
       async (_, { favorite_id }, { models }) => {
         try {
           await models.Favorites.destroy({
@@ -264,9 +275,10 @@ const userResolvers = {
             message: "Successfully removed from Favorites",
           };
         } catch (error) {
-          throw new INTERNAL_SERVER_ERROR(
-            "An unknown error occured, please try your request again"
-          );
+          return {
+            error: true,
+            message: "Failed to add to Favorites",
+          };
         }
       }
     ),

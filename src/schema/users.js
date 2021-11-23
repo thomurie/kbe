@@ -37,7 +37,7 @@ const userShcema = gql`
 
     createFavorite(user_id: String!, bike_id: String!): Error!
 
-    deleteFavorite(favorite_id: String!): Error!
+    deleteFavorite(user_id: String!, favorite_id: String!): Error!
   }
 
   type User {

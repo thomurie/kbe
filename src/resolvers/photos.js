@@ -1,50 +1,89 @@
 const { combineResolvers } = require("graphql-resolvers");
-const { isAuth, isAuthUser } = require("./auth");
+const { isBikeUser } = require("./auth");
+const { PhotoNotFoundError } = require("./customError");
 
-// add error handling
+/**
+ * TODO:
+ * WRITE TESTS
+ */
+
 const photosResolvers = {
   Query: {
-    photo: async (_, { photo_id }, { models }) => {
-      const photoInfo = await models.Photo.findAll({
-        where: {
-          photo_id: photo_id,
-        },
-      });
-      return photoInfo[0].dataValues;
+    photo: async (_, { url }, { models }) => {
+      try {
+        const { dataValues } = await models.Photos.findAll({
+          where: {
+            url: url,
+          },
+        });
+
+        return dataValues;
+      } catch (error) {
+        throw new PhotoNotFoundError(
+          "The photo could not be found. We apologize for the inconvienence"
+        );
+      }
+    },
+
+    photos: async (_, { bike_id }, { models }) => {
+      try {
+        const bikePhotos = await models.Photos.findAll({
+          where: {
+            bike_id: bike_id,
+          },
+        });
+
+        return bikePhotos.map((l) => l.dataValues);
+      } catch (error) {
+        throw new PhotoNotFoundError(
+          "The photos could not be found. We apologize for the inconvienence"
+        );
+      }
     },
   },
 
   Mutation: {
     createPhoto: combineResolvers(
-      isAuth,
+      isBikeUser,
       async (_, { bike_id, url }, { models }) => {
-        const addPhoto = {
-          bike_id,
-          url,
-        };
+        try {
+          const addPhoto = {
+            bike_id,
+            url,
+          };
 
-        console.log(addPhoto);
-        const photo = await models.Photos.create(addPhoto);
+          const photo = await models.Photos.create(addPhoto);
 
-        console.log(photo);
-
-        return photo;
+          return photo;
+        } catch (error) {
+          throw new INTERNAL_SERVER_ERROR(
+            "An unknown error occured, please try your request again"
+          );
+        }
       }
     ),
-    // TODO add authentication
     deletePhoto: combineResolvers(
-      isAuthUser,
-      async (_, { photo_id, confirmation }, { models }) => {
-        await models.Photos.destroy({
-          where: {
-            photo_id: photo_id,
-          },
-        });
+      isBikeUser,
+      async (_, { url, confirmation }, { models }) => {
+        try {
+          if (!confirmation) AuthenticationError("Unconfirmed Photo Removal");
 
-        return {
-          error: false,
-          message: "successfully removed",
-        };
+          await models.Photos.destroy({
+            where: {
+              url: url,
+            },
+          });
+
+          return {
+            error: false,
+            message: "successfully removed",
+          };
+        } catch (error) {
+          return {
+            error: true,
+            message: "An unknown error occured, please try your request again",
+          };
+        }
       }
     ),
   },
