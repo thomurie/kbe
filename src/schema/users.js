@@ -11,10 +11,11 @@ const userShcema = gql`
       password: String!
       first_name: String!
       last_name: String!
-      state: String!
-      area: Int
-      phone: Int
-      text: Boolean
+      country: String!
+      region: String!
+      phone: String
+      sms: Boolean
+      bio: String
     ): Token!
 
     loginUser(email: String!, password: String!): Token!
@@ -22,19 +23,17 @@ const userShcema = gql`
     updateUser(
       email: String!
       password: String!
+      new_password: String
       first_name: String
       last_name: String
-      state: String
-      area: Int
-      phone: Int
-      text: Boolean
-    ): User!
+      country: String
+      region: String
+      phone: String
+      sms: Boolean
+      bio: String
+    ): Token!
 
-    deleteUser(
-      email: String!
-      password: String!
-      confirmation: Boolean!
-    ): Error!
+    deleteUser(email: String!, confirmation: Boolean!): Error!
 
     createFavorite(user_id: String!, bike_id: String!): Error!
 
@@ -43,13 +42,13 @@ const userShcema = gql`
 
   type User {
     email: String!
-    password: String!
     first_name: String!
     last_name: String!
-    state: State!
-    area: Int
-    phone: Int
-    text: Boolean
+    country: Country!
+    region: Region!
+    phone: String
+    sms: Boolean
+    bio: String
     listings: [Bike!]
     favorites: [Bike!]
   }

@@ -15,9 +15,9 @@ const validateUser = async (req) => {
 
   if (token) {
     try {
-      return await jwt.verify(token, "supersecret");
+      return await jwt.verify(token, process.env.SECRET);
     } catch (error) {
-      throw new AuthenticationError("Your session expired. Sign in again.");
+      return null;
     }
   }
 };
@@ -34,8 +34,6 @@ const server = new ApolloServer({
     };
   },
 });
-
-console.log(process.env.DATABASE_URL);
 
 // opt in express as our middleware, specify path for graphql api endpoint
 server.start().then(() => server.applyMiddleware({ app, path: "/graphql" }));

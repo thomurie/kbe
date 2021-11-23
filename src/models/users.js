@@ -51,19 +51,26 @@ Users.init(
         notEmpty: true,
       },
     },
-    state: {
+    country: {
+      type: DataTypes.STRING,
+      defaultValue: "USA",
+      validate: {
+        notEmpty: true,
+      },
+    },
+    region: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
-    area: DataTypes.INTEGER,
-    phone: DataTypes.INTEGER,
-    text: {
+    phone: DataTypes.STRING,
+    sms: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    bio: DataTypes.STRING,
   },
   {
     sequelize,
@@ -81,18 +88,6 @@ Users.loginUser = async (email) => {
   });
 
   return user;
-};
-
-Users.beforeCreate(async (user) => {
-  console.log(user);
-  return (user.password = await bcrypt.hash(
-    user.dataValues.password,
-    saltRounds
-  ));
-});
-
-Users.validatePassword = async (password, existingPassword) => {
-  return await bcrypt.compare(password, existingPassword);
 };
 
 module.exports = Users;

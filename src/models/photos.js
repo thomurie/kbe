@@ -8,18 +8,19 @@ class Photos extends Model {}
 
 Photos.init(
   {
-    photo_id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
+    url: {
+      type: DataTypes.TEXT,
       primaryKey: true,
+      validate: {
+        notEmpty: true,
+      },
     },
     bike_id: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    url: {
-      type: DataTypes.TEXT,
-      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
   },
   {

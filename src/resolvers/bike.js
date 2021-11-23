@@ -3,8 +3,11 @@ const { isAuth, isAuthUser } = require("./auth");
 
 const bikeResolvers = {
   Query: {
-    bikes: async (_, __, { models }) => {
-      const allBikes = await models.Bikes.findAll();
+    bikes: async (_, { offset = 0, limit = 3 }, { models }) => {
+      const allBikes = await models.Bikes.findAll({
+        offset,
+        limit,
+      });
 
       return allBikes.map((b) => b.dataValues);
     },
@@ -41,7 +44,6 @@ const bikeResolvers = {
   },
 
   Mutation: {
-    // TODO HANDLE PHOTOS
     createListing: combineResolvers(
       isAuth,
       async (

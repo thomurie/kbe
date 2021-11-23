@@ -48,7 +48,14 @@ Bikes.init(
         notEmpty: true,
       },
     },
-    state: {
+    country: {
+      type: DataTypes.STRING,
+      defaultValue: "USA",
+      validate: {
+        notEmpty: true,
+      },
+    },
+    region: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {

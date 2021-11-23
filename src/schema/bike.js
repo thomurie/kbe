@@ -2,7 +2,7 @@ const { gql } = require("apollo-server");
 
 const bikeSchema = gql`
   extend type Query {
-    bikes: [Bike!]
+    bikes(offset: Int, limit: Int): [Bike!]
     bike(id: ID!): Bike
   }
 
@@ -23,6 +23,7 @@ const bikeSchema = gql`
       rear: Int
       upgrades: String
     ): Bike!
+
     updateListing(
       bike_id: ID!
       make: String
@@ -39,6 +40,7 @@ const bikeSchema = gql`
       rear: Int
       upgrades: String
     ): Bike!
+    
     deleteListing(bike_id: ID!, confirmation: Boolean!): Error!
   }
 
@@ -49,25 +51,31 @@ const bikeSchema = gql`
     model: String!
     year: Int!
     price: Int!
-    state: State!
+    country: Country!
+    region: Region!
     size: Size
+    about: String
     color: Color
     wheel_size: String
     suspension: Suspension
     front: Int
     rear: Int
-    about: String
     upgrades: String
     is_active: Boolean!
     createdat: String!
     photos: [Photo!]
-    error: Boolean!
   }
 
-  enum State {
+  enum Country {
+    CAN
+    USA
+  }
+
+  enum Region {
+    AB
     AL
-    AZ
     AR
+    AZ
     CA
     CO
     CT
@@ -81,29 +89,39 @@ const bikeSchema = gql`
     KS
     KY
     LA
-    ME
-    MD
     MA
+    MB
+    MD
+    ME
     MI
     MN
-    MS
     MO
+    MS
     MT
-    NE
-    NV
-    NH
-    NJ
-    NM
-    NY
+    NB
     NC
     ND
+    NE
+    NH
+    NJ
+    NL
+    NM
+    NS
+    NT
+    NU
+    NV
+    NY
     OH
     OK
+    ON
     OR
     PA
+    PE
+    QC
     RI
     SC
     SD
+    SK
     TN
     TX
     UT
@@ -113,6 +131,7 @@ const bikeSchema = gql`
     WV
     WI
     WY
+    YT
   }
 
   enum Size {
