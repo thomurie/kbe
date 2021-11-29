@@ -49,9 +49,20 @@ const userResolvers = {
 
         return dataValues;
       } catch (err) {
-        throw new UserNotFoundError(
-          "The user could not be found. We apologize for the inconvienence"
-        );
+        console.error(error);
+      }
+    },
+    authUser: async (_, __, { models, user }) => {
+      try {
+        const { dataValues } = await models.Users.findOne({
+          where: {
+            email: user.email,
+          },
+        });
+
+        return dataValues;
+      } catch (err) {
+        console.error(error);
       }
     },
   },
@@ -72,39 +83,34 @@ const userResolvers = {
         );
       }
     },
-    favorites: combineResolvers(
-      isAuthUser,
-      async ({ email }, __, { models }) => {
-        try {
-          const userFavorites = await models.Favorites.findAll({
-            where: {
-              user_id: email,
-            },
-          });
+    favorites: combineResolvers(async (_, __, { models, user }) => {
+      try {
+        const userFavorites = await models.Favorites.findAll({
+          where: {
+            user_id: user.email,
+          },
+        });
 
-          const results = userFavorites.map((l) => l.dataValues.bike_id);
+        const results = userFavorites.map((l) => l.dataValues.bike_id);
 
-          const newResults = async () => {
-            return Promise.all(
-              results.map(async (b) => {
-                const bike = await models.Bikes.findAll({
-                  where: {
-                    bike_id: b,
-                  },
-                });
-                return bike[0].dataValues;
-              })
-            );
-          };
-
-          return newResults().then((data) => data);
-        } catch (error) {
-          throw new INTERNAL_SERVER_ERROR(
-            "An unknown error occured, please try your request again"
+        const newResults = async () => {
+          return Promise.all(
+            results.map(async (b) => {
+              const bike = await models.Bikes.findAll({
+                where: {
+                  bike_id: b,
+                },
+              });
+              return bike[0].dataValues;
+            })
           );
-        }
+        };
+
+        return newResults().then((data) => data);
+      } catch (error) {
+        console.error(error);
       }
-    ),
+    }),
   },
 
   Mutation: {
@@ -138,7 +144,10 @@ const userResolvers = {
 
         const user = await models.Users.create(addUser);
 
-        return { token: createToken(user, secret, "1h") };
+        return {
+          user,
+          token: createToken(user, secret, "1h"),
+        };
       } catch (error) {
         UserInputError("Invalid Data Entered");
       }
@@ -157,7 +166,10 @@ const userResolvers = {
 
       if (!validUser) throw new AuthenticationError("Invalid Password");
 
-      return { token: createToken(dataValues, secret, "30m") };
+      return {
+        user: dataValues,
+        token: createToken(dataValues, secret, "30m"),
+      };
     },
 
     updateUser: combineResolvers(
@@ -209,7 +221,10 @@ const userResolvers = {
             },
           });
 
-          return { token: createToken(updateData, secret, "30m") };
+          return {
+            user: dataValues,
+            token: createToken(updateData, secret, "30m"),
+          };
         } catch (error) {
           console.error(error);
           new UserInputError("Invalid Data Entered");
@@ -253,21 +268,20 @@ const userResolvers = {
             message: "Successfully added to Favorites",
           };
         } catch (error) {
-          return {
-            error: true,
-            message: "Failed to add to Favorites",
-          };
+          console.error(error);
         }
       }
     ),
     // TODO TEST
     deleteFavorite: combineResolvers(
-      isFavUser,
-      async (_, { favorite_id }, { models }) => {
+      isAuth,
+      async (_, { bike_id }, { models, user }) => {
         try {
+          const user_id = user.email;
           await models.Favorites.destroy({
             where: {
-              favorite_id: favorite_id,
+              bike_id: bike_id,
+              user_id: user_id,
             },
           });
           return {
@@ -275,10 +289,7 @@ const userResolvers = {
             message: "Successfully removed from Favorites",
           };
         } catch (error) {
-          return {
-            error: true,
-            message: "Failed to add to Favorites",
-          };
+          console.error(error);
         }
       }
     ),

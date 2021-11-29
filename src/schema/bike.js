@@ -3,19 +3,19 @@ const { gql } = require("apollo-server");
 const bikeSchema = gql`
   extend type Query {
     bikes(offset: Int, limit: Int): [Bike!]
-    bike(id: ID!): Bike
+    bike(bike_id: ID!): Bike
   }
 
   extend type Mutation {
     createListing(
-      user_id: ID!
       make: String!
       model: String!
       year: Int!
       price: Int!
-      state: String!
-      size: String
+      country: String!
+      region: String!
       about: String
+      size: String
       color: String
       wheel_size: String
       suspension: String
@@ -30,9 +30,10 @@ const bikeSchema = gql`
       model: String
       year: Int
       price: Int
-      state: String
-      size: String
+      country: String
+      region: String
       about: String
+      size: String
       color: String
       wheel_size: String
       suspension: String
@@ -40,7 +41,7 @@ const bikeSchema = gql`
       rear: Int
       upgrades: String
     ): Bike!
-    
+
     deleteListing(bike_id: ID!, confirmation: Boolean!): Error!
   }
 
@@ -53,8 +54,8 @@ const bikeSchema = gql`
     price: Int!
     country: Country!
     region: Region!
-    size: Size
     about: String
+    size: Size
     color: Color
     wheel_size: String
     suspension: Suspension
@@ -76,6 +77,7 @@ const bikeSchema = gql`
     AL
     AR
     AZ
+    BC
     CA
     CO
     CT
@@ -142,24 +144,24 @@ const bikeSchema = gql`
   }
 
   enum Color {
-    Black
-    Blue
-    Brown
-    Green
-    Grey
-    Orange
-    Purple
-    Red
-    Silver
-    White
-    Yellow
-    Other
+    black
+    blue
+    brown
+    green
+    grey
+    orange
+    purple
+    red
+    silver
+    white
+    yellow
+    other
   }
 
   enum Suspension {
-    None
-    Front
-    Full
+    none
+    front
+    full
   }
 `;
 

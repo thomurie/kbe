@@ -1,6 +1,6 @@
 const { combineResolvers } = require("graphql-resolvers");
-const { AuthenticationError, INTERNAL_SERVER_ERROR } = require("apollo-server");
-const { isAuth, isAuthUser } = require("./auth");
+const { AuthenticationError } = require("apollo-server");
+const { isAuth, isAuthUser, isBikeUser } = require("./auth");
 const { BikeNotFoundError, PhotoNotFoundError } = require("./customError");
 
 /**
@@ -10,7 +10,7 @@ const { BikeNotFoundError, PhotoNotFoundError } = require("./customError");
 
 const bikeResolvers = {
   Query: {
-    bikes: async (_, { offset = 0, limit = 3 }, { models }) => {
+    bikes: async (_, { offset = 0, limit = 9 }, { models }) => {
       try {
         const allBikes = await models.Bikes.findAll({
           offset,
@@ -19,9 +19,7 @@ const bikeResolvers = {
 
         return allBikes.map((b) => b.dataValues);
       } catch (error) {
-        throw new INTERNAL_SERVER_ERROR(
-          "An unknown error occured, please try your request again"
-        );
+        console.error(error);
       }
     },
 
@@ -34,8 +32,9 @@ const bikeResolvers = {
         });
         return dataValues;
       } catch (error) {
+        console.error(error);
         throw new BikeNotFoundError(
-          "The user could not be found. We apologize for the inconvienence"
+          "The bike could not be found. We apologize for the inconvienence"
         );
       }
     },
@@ -99,6 +98,7 @@ const bikeResolvers = {
         { models, user }
       ) => {
         try {
+          console.log(user);
           const addBike = {
             user_id: user.email,
             make,
@@ -121,18 +121,17 @@ const bikeResolvers = {
 
           return bike;
         } catch (error) {
-          throw new INTERNAL_SERVER_ERROR(
-            "An unknown error occured, please try your request again"
-          );
+          console.error(error);
         }
       }
     ),
 
     updateListing: combineResolvers(
-      isAuthUser,
+      isBikeUser,
       async (
         _,
         {
+          bike_id,
           make,
           model,
           year,
@@ -183,15 +182,13 @@ const bikeResolvers = {
 
           return dataValues;
         } catch (error) {
-          throw new INTERNAL_SERVER_ERROR(
-            "An unknown error occured, please try your request again"
-          );
+          console.log(error);
         }
       }
     ),
 
     deleteListing: combineResolvers(
-      isAuthUser,
+      isBikeUser,
       async (_, { bike_id, confirmation }, { models }) => {
         try {
           if (!confirmation) AuthenticationError("Unconfirmed Account Removal");

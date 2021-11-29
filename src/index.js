@@ -11,7 +11,7 @@ const app = express();
 app.use(cors());
 
 const validateUser = async (req) => {
-  const token = req.headers["x-token"];
+  const token = req.headers["authorization"];
 
   if (token) {
     try {
@@ -42,9 +42,3 @@ sequelize.sync({ alter: true }).then(async () => {
     console.log(`Server is running on port 8000`);
   });
 });
-
-/**
- * TODO
- * env for Database URL
- * env for Secret
- */

@@ -4,9 +4,12 @@ const Bikes = require("./bikes");
 const Favorites = require("./favorites");
 const Photos = require("./photos");
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: "postgres",
-});
+const sequelize = new Sequelize(
+  process.env.TEST_DATABASE || process.env.DATABASE_URL,
+  {
+    dialect: "postgres",
+  }
+);
 
 // // one-to-many for Bikes
 // Users.hasMany(Bikes, {

@@ -4,6 +4,7 @@ DROP DATABASE IF EXISTS knobby;
 
 CREATE DATABASE knobby;
 
+-- \c knobbytest;
 \c knobby;
 
 CREATE EXTENSION IF NOT EXISTS 'pgcrypto';
@@ -16,9 +17,9 @@ DROP TABLE IF EXISTS photos;
 CREATE TYPE country AS ENUM('CAN', 'USA');
 CREATE TYPE region AS ENUM('AB', 'AL', 'AR', 'AZ', 'BC', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'MA', 'MB', 'MD', 'ME', 'MI', 'MN', 'MO', 'MS', 'MT', 'NB', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NL', 'NM', 'NS', 'NT', 'NU', 'NV','NY', 'OH', 'OK', 'ON', 'OR', 'PA', 'PE', 'QC', 'RI', 'SC', 'SD', 'SK', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'YT');
 CREATE TYPE size AS ENUM('S', 'M', 'L', 'XL');
-CREATE TYPE color AS ENUM('Black', 'Blue', 'Brown', 'Green', 'Grey', 'Orange', 'Purple', 'Red', 'Silver', 'White', 'Yellow', 'Other');
-CREATE TYPE suspension AS ENUM('None', 'Front', 'Full');
-CREATE TYPE wheel_size as ENUM('26', '27.5', '29', 'Other');
+CREATE TYPE color AS ENUM('black', 'blue', 'brown', 'green', 'grey', 'orange', 'purple', 'red', 'silver', 'white', 'yellow', 'other');
+CREATE TYPE suspension AS ENUM('none', 'front', 'full');
+CREATE TYPE wheel_size as ENUM('26', '27.5', '29', 'other');
 
 CREATE TABLE users (
     email VARCHAR(255) UNIQUE PRIMARY KEY,
@@ -43,8 +44,8 @@ CREATE TABLE bikes (
     price SMALLINT NOT NULL,
     country country DEFAULT 'USA',
     region region NOT NULL,
-    size size,
     about VARCHAR(255),
+     size size,
     color color,
     wheel_size wheel_size,
     suspension suspension,
