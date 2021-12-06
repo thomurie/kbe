@@ -2,11 +2,13 @@ const { gql } = require("apollo-server");
 
 const userShcema = gql`
   extend type Query {
-    user(email: String!): User!
-    authUser: User!
+    user(email: String!): Pkg!
+    authUser: Pkg!
   }
 
   extend type Mutation {
+    authToken(token: String!): Pkg!
+
     createUser(
       email: String!
       password: String!
@@ -17,9 +19,9 @@ const userShcema = gql`
       phone: String
       sms: Boolean
       bio: String
-    ): Token!
+    ): Pkg!
 
-    loginUser(email: String!, password: String!): Token!
+    loginUser(email: String!, password: String!): Pkg!
 
     updateUser(
       email: String!
@@ -32,13 +34,13 @@ const userShcema = gql`
       phone: String
       sms: Boolean
       bio: String
-    ): Token!
+    ): Pkg!
 
-    deleteUser(email: String!, confirmation: Boolean!): Error!
+    deleteUser(email: String!, confirmation: Boolean!): Pkg!
 
-    createFavorite(bike_id: String!): Error!
+    createFavorite(bike_id: String!): Pkg!
 
-    deleteFavorite(bike_id: String!): Error!
+    deleteFavorite(bike_id: String!): Pkg!
   }
 
   type User {
@@ -56,12 +58,16 @@ const userShcema = gql`
 
   type Token {
     token: String!
-    user: User!
   }
 
-  type Error {
+  type Pkg {
     error: Boolean!
-    message: String!
+    message: String
+    token: String
+    owner: Boolean
+    bike: Bike
+    user: User
+    photo: Photo
   }
 `;
 

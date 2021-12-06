@@ -1,7 +1,13 @@
-const { combineResolvers } = require("graphql-resolvers");
+const { skip, combineResolvers } = require("graphql-resolvers");
 const { AuthenticationError } = require("apollo-server");
+
 const { isAuth, isAuthUser, isBikeUser } = require("./auth");
-const { BikeNotFoundError, PhotoNotFoundError } = require("./customError");
+const {
+  BikeNotFoundError,
+  PhotoNotFoundError,
+  UserNotFoundError,
+} = require("./customError");
+const { Op } = require("sequelize");
 
 /**
  * TODO:
@@ -10,12 +16,32 @@ const { BikeNotFoundError, PhotoNotFoundError } = require("./customError");
 
 const bikeResolvers = {
   Query: {
-    bikes: async (_, { offset = 0, limit = 9 }, { models }) => {
+    bikes: async (_, { offset, limit, search }, { models }) => {
+      console.log(offset);
       try {
-        const allBikes = await models.Bikes.findAll({
-          offset,
-          limit,
-        });
+        const allBikes = search
+          ? await models.Bikes.findAll({
+              offset,
+              limit,
+              where: {
+                [Op.or]: [
+                  {
+                    make: {
+                      [Op.iLike]: `%${search}%`,
+                    },
+                  },
+                  {
+                    model: {
+                      [Op.iLike]: `%${search}%`,
+                    },
+                  },
+                ],
+              },
+            })
+          : await models.Bikes.findAll({
+              offset,
+              limit,
+            });
 
         return allBikes.map((b) => b.dataValues);
       } catch (error) {
@@ -23,19 +49,51 @@ const bikeResolvers = {
       }
     },
 
-    bike: async (_, { bike_id }, { models }) => {
+    bike: async (_, { bike_id }, { models, user }) => {
+      let owner = false;
+      let message = null;
       try {
-        const { dataValues } = await models.Bikes.findOne({
+        const results = await models.Bikes.findOne({
           where: {
             bike_id: bike_id,
           },
         });
-        return dataValues;
-      } catch (error) {
-        console.error(error);
-        throw new BikeNotFoundError(
-          "The bike could not be found. We apologize for the inconvienence"
-        );
+
+        if (!results)
+          throw new BikeNotFoundError(
+            "The bike could not be found. We apologize for the inconvienence"
+          );
+
+        if (user) {
+          if (user.email === results.dataValues.user_id) {
+            owner = true;
+          } else {
+            const userFavorite = await models.Favorites.findOne({
+              where: {
+                user_id: user.email,
+                bike_id: bike_id,
+              },
+            });
+
+            if (userFavorite) {
+              message = "fav";
+            } else {
+              message = "auth";
+            }
+          }
+        }
+
+        return {
+          error: false,
+          owner,
+          message,
+          bike: results.dataValues,
+        };
+      } catch (err) {
+        return {
+          error: true,
+          message: err.message,
+        };
       }
     },
   },
@@ -65,10 +123,15 @@ const bikeResolvers = {
           },
         });
 
+        if (!bikePhotos)
+          throw new PhotoNotFoundError(
+            "The photos could not be found. We apologize for the inconvienence"
+          );
+
         return bikePhotos.map((l) => l.dataValues);
       } catch (error) {
         throw new PhotoNotFoundError(
-          "The photo could not be found. We apologize for the inconvienence"
+          "The photos could not be found. We apologize for the inconvienence"
         );
       }
     },
@@ -98,7 +161,6 @@ const bikeResolvers = {
         { models, user }
       ) => {
         try {
-          console.log(user);
           const addBike = {
             user_id: user.email,
             make,
@@ -119,9 +181,18 @@ const bikeResolvers = {
 
           const bike = await models.Bikes.create(addBike);
 
-          return bike;
-        } catch (error) {
-          console.error(error);
+          return {
+            error: false,
+            message: "bike created successfully",
+            bike,
+            owner: true,
+          };
+        } catch (err) {
+          console.log(err);
+          return {
+            error: true,
+            message: err.message,
+          };
         }
       }
     ),
@@ -174,15 +245,15 @@ const bikeResolvers = {
             }
           );
 
-          const { dataValues } = await models.Bikes.findOne({
-            where: {
-              bike_id: bike_id,
-            },
-          });
-
-          return dataValues;
-        } catch (error) {
-          console.log(error);
+          return {
+            error: false,
+            message: " Bike updated successfully.",
+          };
+        } catch (err) {
+          return {
+            error: true,
+            message: err.message,
+          };
         }
       }
     ),

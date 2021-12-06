@@ -2,8 +2,8 @@ const { gql } = require("apollo-server");
 
 const bikeSchema = gql`
   extend type Query {
-    bikes(offset: Int, limit: Int): [Bike!]
-    bike(bike_id: ID!): Bike
+    bikes(offset: Int, limit: Int, search: String): [Bike!]
+    bike(bike_id: ID!): Pkg!
   }
 
   extend type Mutation {
@@ -22,7 +22,7 @@ const bikeSchema = gql`
       front: Int
       rear: Int
       upgrades: String
-    ): Bike!
+    ): Pkg!
 
     updateListing(
       bike_id: ID!
@@ -40,9 +40,9 @@ const bikeSchema = gql`
       front: Int
       rear: Int
       upgrades: String
-    ): Bike!
+    ): Pkg!
 
-    deleteListing(bike_id: ID!, confirmation: Boolean!): Error!
+    deleteListing(bike_id: ID!, confirmation: Boolean!): Pkg!
   }
 
   type Bike {

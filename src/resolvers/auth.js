@@ -1,4 +1,5 @@
 const { ForbiddenError } = require("apollo-server");
+const { use } = require("chai");
 const { skip, combineResolvers } = require("graphql-resolvers");
 
 /**
@@ -7,6 +8,7 @@ const { skip, combineResolvers } = require("graphql-resolvers");
  */
 
 const isAuth = (_, __, { user }) => {
+  console.log(user);
   return user
     ? skip
     : new ForbiddenError(
@@ -16,16 +18,15 @@ const isAuth = (_, __, { user }) => {
 
 const isBikeUser = combineResolvers(
   isAuth,
-  async (_, { bike_id }, { models, user }) => {
-    const bike = await models.Bikes.findAll({
+  async (_, { bike_id, url }, { models, user }) => {
+    const bike = await models.Bikes.findOne({
       where: {
         bike_id: bike_id,
+        user_id: user.email,
       },
     });
-    const bikeUserId = bike[0].dataValues.user_id;
 
-    if (bikeUserId !== user.email)
-      throw new ForbiddenError("Not Authorized as owner");
+    if (!bike) throw new ForbiddenError("Not Authorized as owner");
 
     return skip;
   }
@@ -50,12 +51,13 @@ const isFavUser = combineResolvers(
 const isAuthUser = combineResolvers(
   isAuth,
   async ({ email }, _, { models, user }) => {
-    const userInfo = await models.Users.findAll({
+    const userInfo = await models.Users.findOne({
       where: {
         email: email,
       },
     });
-    const userId = userInfo[0].dataValues.email;
+
+    const userId = userInfo.dataValues.email;
 
     if (userId !== user.email)
       throw new ForbiddenError("Not Authorized as User");
@@ -67,13 +69,15 @@ const isAuthUser = combineResolvers(
 const isAuthUserArg = combineResolvers(
   isAuth,
   async (_, { email }, { models, user }) => {
-    const userInfo = await models.Users.findAll({
+    const userInfo = await models.Users.findOne({
       where: {
         email: email,
       },
     });
 
-    const userId = userInfo[0].dataValues.email;
+    console.log(userInfo);
+
+    const userId = userInfo.dataValues.email;
 
     if (userId !== user.email)
       throw new ForbiddenError("Not Authorized as User");

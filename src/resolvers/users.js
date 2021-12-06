@@ -39,30 +39,65 @@ const createToken = async (user, secret, expiresIn) => {
 
 const userResolvers = {
   Query: {
-    user: async (_, { email }, { models }) => {
+    user: async (_, { email }, { models, user }) => {
+      let owner = false;
+      let message = null;
       try {
-        const { dataValues } = await models.Users.findOne({
+        const results = await models.Users.findOne({
           where: {
             email: email,
           },
         });
 
-        return dataValues;
+        if (!results)
+          throw new UserNotFoundError(
+            "The user could not be found. We apologize for the inconvienence"
+          );
+
+        if (user) {
+          if (user.email === email) {
+            owner = true;
+          } else {
+            message = "auth";
+          }
+        }
+
+        return {
+          error: false,
+          owner,
+          message,
+          user: results.dataValues,
+        };
       } catch (err) {
-        console.error(error);
+        return {
+          error: true,
+          message: err.message,
+        };
       }
     },
+
     authUser: async (_, __, { models, user }) => {
       try {
-        const { dataValues } = await models.Users.findOne({
+        if (!user) throw new AuthenticationError();
+
+        const results = await models.Users.findOne({
           where: {
             email: user.email,
           },
         });
 
-        return dataValues;
+        if (!results) throw new Error("User Not Found!");
+
+        return {
+          error: false,
+          owner: true,
+          user: results.dataValues,
+        };
       } catch (err) {
-        console.error(error);
+        return {
+          error: true,
+          message: err.message,
+        };
       }
     },
   },
@@ -144,32 +179,56 @@ const userResolvers = {
 
         const user = await models.Users.create(addUser);
 
+        if (!user) {
+          await models.Users.destroy({
+            where: {
+              email: email,
+            },
+          });
+          throw new UserInputError("Invalid Data Entered");
+        }
+
         return {
+          error: false,
           user,
-          token: createToken(user, secret, "1h"),
+          token: createToken(user, secret, "5m"),
         };
-      } catch (error) {
-        UserInputError("Invalid Data Entered");
+      } catch (err) {
+        return {
+          error: true,
+          message: err.message,
+        };
       }
     },
 
     loginUser: async (_, { email, password }, { models, secret }) => {
-      const { dataValues } = await models.Users.findOne({
-        where: {
-          email: email,
-        },
-      });
+      try {
+        const results = await models.Users.findOne({
+          where: {
+            email: email,
+          },
+        });
 
-      if (!dataValues) throw new UserInputError("Invalid Username");
+        if (!results) throw new UserInputError("Invalid Username");
 
-      const validUser = await validateUser(password, dataValues.password);
+        const validUser = await validateUser(
+          password,
+          results.dataValues.password
+        );
 
-      if (!validUser) throw new AuthenticationError("Invalid Password");
+        if (!validUser) throw new AuthenticationError("Invalid Password");
 
-      return {
-        user: dataValues,
-        token: createToken(dataValues, secret, "30m"),
-      };
+        return {
+          error: false,
+          user: results.dataValues,
+          token: createToken(results.dataValues, secret, "30m"),
+        };
+      } catch (error) {
+        return {
+          error: true,
+          message: error.message,
+        };
+      }
     },
 
     updateUser: combineResolvers(
@@ -190,13 +249,13 @@ const userResolvers = {
         { models, secret, user }
       ) => {
         try {
-          const { dataValues } = await models.Users.findOne({
+          const results = await models.Users.findOne({
             where: {
               email: user.email,
             },
           });
 
-          if (!dataValues) throw new UserInputError("Invalid Username");
+          if (!results) throw new UserInputError("Invalid Username");
 
           const updateData = {
             first_name,
@@ -208,7 +267,10 @@ const userResolvers = {
             bio,
           };
 
-          const validUser = await validateUser(password, dataValues.password);
+          const validUser = await validateUser(
+            password,
+            results.dataValues.password
+          );
 
           if (!validUser) throw new AuthenticationError("Invalid Password");
 
@@ -222,19 +284,22 @@ const userResolvers = {
           });
 
           return {
-            user: dataValues,
-            token: createToken(updateData, secret, "30m"),
+            error: false,
+            user: results.dataValues,
+            token: createToken(results.dataValues, secret, "30m"),
           };
         } catch (error) {
-          console.error(error);
-          new UserInputError("Invalid Data Entered");
+          return {
+            error: true,
+            message: error.message,
+          };
         }
       }
     ),
 
     deleteUser: combineResolvers(
       isAuthUserArg,
-      async (_, { email, confirmation }, { models, user }) => {
+      async (_, { email, confirmation }, { models }) => {
         try {
           if (!confirmation) AuthenticationError("Unconfirmed Account Removal");
 
@@ -251,7 +316,9 @@ const userResolvers = {
         } catch (error) {
           return {
             error: true,
-            message: "An unknown error occured, please try your request again",
+            message:
+              err.message ||
+              "An unknown error occured, please try your request again",
           };
         }
       }
@@ -267,8 +334,13 @@ const userResolvers = {
             error: false,
             message: "Successfully added to Favorites",
           };
-        } catch (error) {
-          console.error(error);
+        } catch (err) {
+          return {
+            error: true,
+            message:
+              err.message ||
+              "An unknown error occured, please try your request again",
+          };
         }
       }
     ),
@@ -288,8 +360,13 @@ const userResolvers = {
             error: false,
             message: "Successfully removed from Favorites",
           };
-        } catch (error) {
-          console.error(error);
+        } catch (err) {
+          return {
+            error: true,
+            message:
+              err.message ||
+              "An unknown error occured, please try your request again",
+          };
         }
       }
     ),

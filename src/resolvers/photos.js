@@ -1,6 +1,13 @@
 const { combineResolvers } = require("graphql-resolvers");
 const { isBikeUser } = require("./auth");
 const { PhotoNotFoundError } = require("./customError");
+const cloudinary = require("cloudinary");
+
+cloudinary.config({
+  cloud_name: "knobbybikeexch",
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 
 /**
  * TODO:
@@ -33,6 +40,11 @@ const photosResolvers = {
           },
         });
 
+        if (!bikePhotos)
+          throw new PhotoNotFoundError(
+            "The photos could not be found. We apologize for the inconvienence"
+          );
+
         return bikePhotos.map((l) => l.dataValues);
       } catch (error) {
         throw new PhotoNotFoundError(
@@ -54,6 +66,11 @@ const photosResolvers = {
 
           const photo = await models.Photos.create(addPhoto);
 
+          if (!photo)
+            throw new PhotoNotFoundError(
+              "The photos could not be found. We apologize for the inconvienence"
+            );
+
           return photo;
         } catch (error) {
           throw new INTERNAL_SERVER_ERROR(
@@ -74,11 +91,20 @@ const photosResolvers = {
             },
           });
 
+          try {
+            cloudinary.uploader.destroy(url, (result) => {
+              console.log(result);
+            });
+          } catch (error) {
+            console.log(error);
+          }
+
           return {
             error: false,
             message: "successfully removed",
           };
         } catch (error) {
+          console.error(error);
           return {
             error: true,
             message: "An unknown error occured, please try your request again",
