@@ -1,5 +1,6 @@
+// EXTERNAL IMPORTS
 const { gql } = require("apollo-server");
-
+// GRAPHQL USER SCHEMA
 const userShcema = gql`
   extend type Query {
     user(email: String!): Pkg!
@@ -7,8 +8,6 @@ const userShcema = gql`
   }
 
   extend type Mutation {
-    authToken(token: String!): Pkg!
-
     createUser(
       email: String!
       password: String!
@@ -20,9 +19,7 @@ const userShcema = gql`
       sms: Boolean
       bio: String
     ): Pkg!
-
     loginUser(email: String!, password: String!): Pkg!
-
     updateUser(
       email: String!
       password: String!
@@ -35,11 +32,8 @@ const userShcema = gql`
       sms: Boolean
       bio: String
     ): Pkg!
-
     deleteUser(email: String!, confirmation: Boolean!): Pkg!
-
     createFavorite(bike_id: String!): Pkg!
-
     deleteFavorite(bike_id: String!): Pkg!
   }
 
@@ -55,11 +49,9 @@ const userShcema = gql`
     listings: [Bike!]
     favorites: [Bike!]
   }
-
   type Token {
     token: String!
   }
-
   type Pkg {
     error: Boolean!
     message: String

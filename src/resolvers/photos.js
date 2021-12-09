@@ -1,30 +1,32 @@
+// EXTERNAL IMPORTS
+const cloudinary = require("cloudinary");
 const { combineResolvers } = require("graphql-resolvers");
+// LOCAL IMPORTS
 const { isBikeUser } = require("./auth");
 const { PhotoNotFoundError } = require("./customError");
-const cloudinary = require("cloudinary");
-
+// CONFIG
 cloudinary.config({
   cloud_name: "knobbybikeexch",
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
-
-/**
- * TODO:
- * WRITE TESTS
- */
-
+// RESOLVERS
 const photosResolvers = {
   Query: {
     photo: async (_, { url }, { models }) => {
       try {
-        const { dataValues } = await models.Photos.findAll({
+        const results = await models.Photos.findAll({
           where: {
             url: url,
           },
         });
 
-        return dataValues;
+        if (!results)
+          throw new PhotoNotFoundError(
+            "The photo could not be found. We apologize for the inconvienence"
+          );
+
+        return results.dataValues;
       } catch (error) {
         throw new PhotoNotFoundError(
           "The photo could not be found. We apologize for the inconvienence"

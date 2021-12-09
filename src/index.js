@@ -1,15 +1,17 @@
+// EXTERNAL IMPORTS
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-require("dotenv").config();
 const express = require("express");
-const { ApolloServer, AuthenticationError } = require("apollo-server-express");
+const { ApolloServer } = require("apollo-server-express");
+// LOCAL IMPORTS
 const typeDefs = require("./schema/index");
 const resolvers = require("./resolvers/index");
 const { sequelize, models } = require("./models/index");
-
+// CONFIG
+require("dotenv").config();
 const app = express();
 app.use(cors());
-
+// HELPER FUNCTIONS
 const validateUser = async (req) => {
   const token = req.headers["authorization"];
 
@@ -21,7 +23,7 @@ const validateUser = async (req) => {
     }
   }
 };
-
+// SERVER CONFIGURATION
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -35,7 +37,7 @@ const server = new ApolloServer({
   },
 });
 
-// opt in express as our middleware, specify path for graphql api endpoint
+// INITALIZE SERVER ON NPM START
 server.start().then(() => server.applyMiddleware({ app, path: "/graphql" }));
 sequelize.sync({ alter: true }).then(async () => {
   await app.listen(8000, () => {

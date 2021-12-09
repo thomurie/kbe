@@ -1,23 +1,19 @@
-const { skip, combineResolvers } = require("graphql-resolvers");
+// EXTERNAL IMPORTS
+const { combineResolvers } = require("graphql-resolvers");
 const { AuthenticationError } = require("apollo-server");
-
-const { isAuth, isAuthUser, isBikeUser } = require("./auth");
+// LOCAL IMPORTS
+const { isAuth, isBikeUser } = require("./auth");
 const {
   BikeNotFoundError,
   PhotoNotFoundError,
   UserNotFoundError,
 } = require("./customError");
+// CONFIG
 const { Op } = require("sequelize");
-
-/**
- * TODO:
- * WRITE TESTS
- */
-
+// RESOLVERS
 const bikeResolvers = {
   Query: {
     bikes: async (_, { offset, limit, search }, { models }) => {
-      console.log(offset);
       try {
         const allBikes = search
           ? await models.Bikes.findAll({
@@ -43,16 +39,23 @@ const bikeResolvers = {
               limit,
             });
 
+        if (!allBikes || allBikes.length === 0)
+          throw new BikeNotFoundError(
+            "The bike could not be found. We apologize for the inconvienence"
+          );
+
         return allBikes.map((b) => b.dataValues);
       } catch (error) {
-        console.error(error);
+        throw new BikeNotFoundError(
+          "The bike could not be found. We apologize for the inconvienence"
+        );
       }
     },
 
     bike: async (_, { bike_id }, { models, user }) => {
-      let owner = false;
-      let message = null;
       try {
+        let owner = false;
+        let message = null;
         const results = await models.Bikes.findOne({
           where: {
             bike_id: bike_id,
@@ -101,13 +104,18 @@ const bikeResolvers = {
   Bike: {
     user_id: async ({ user_id }, _, { models }) => {
       try {
-        const { dataValues } = await models.Users.findOne({
+        const results = await models.Users.findOne({
           where: {
             email: user_id,
           },
         });
 
-        return dataValues;
+        if (!results)
+          throw new UserNotFoundError(
+            "The user could not be found. We apologize for the inconvienence"
+          );
+
+        return results.dataValues;
       } catch (err) {
         throw new UserNotFoundError(
           "The user could not be found. We apologize for the inconvienence"
@@ -180,6 +188,11 @@ const bikeResolvers = {
           };
 
           const bike = await models.Bikes.create(addBike);
+
+          if (!bike)
+            throw new BikeNotFoundError(
+              "The bike could not be found. We apologize for the inconvienence"
+            );
 
           return {
             error: false,

@@ -1,15 +1,14 @@
+// EXTERNAL IMPORTS
 const jwt = require("jsonwebtoken");
-const {
-  AuthenticationError,
-  UserInputError,
-  INTERNAL_SERVER_ERROR,
-} = require("apollo-server");
+const { AuthenticationError, UserInputError } = require("apollo-server");
 const { combineResolvers } = require("graphql-resolvers");
-const { isAuth, isAuthUser, isAuthUserArg, isFavUser } = require("./auth");
-const { UserNotFoundError } = require("./customError");
 const bcrypt = require("bcrypt");
+// LOCAL IMPORTS
+const { isAuth, isAuthUserArg } = require("./auth");
+const { UserNotFoundError } = require("./customError");
+// CONFIG
 const saltRounds = 10;
-
+// HELPER FUNCTIONS
 const hashPassword = async (plainTextPwd) => {
   return await bcrypt.hash(plainTextPwd, saltRounds);
 };
@@ -31,18 +30,13 @@ const createToken = async (user, secret, expiresIn) => {
     { expiresIn }
   );
 };
-
-/**
- * TODO:
- * WRITE TESTS
- */
-
+// RESOLVERS
 const userResolvers = {
   Query: {
     user: async (_, { email }, { models, user }) => {
-      let owner = false;
-      let message = null;
       try {
+        let owner = false;
+        let message = null;
         const results = await models.Users.findOne({
           where: {
             email: email,
@@ -323,7 +317,7 @@ const userResolvers = {
         }
       }
     ),
-    // TODO TEST
+
     createFavorite: combineResolvers(
       isAuth,
       async (_, { bike_id }, { models, user }) => {
@@ -344,7 +338,7 @@ const userResolvers = {
         }
       }
     ),
-    // TODO TEST
+
     deleteFavorite: combineResolvers(
       isAuth,
       async (_, { bike_id }, { models, user }) => {

@@ -1,11 +1,11 @@
+// EXTERNAL IMPORTS
 const { gql } = require("apollo-server");
-
+// GRAPHQL BIKE SCHEMA
 const bikeSchema = gql`
   extend type Query {
     bikes(offset: Int, limit: Int, search: String): [Bike!]
     bike(bike_id: ID!): Pkg!
   }
-
   extend type Mutation {
     createListing(
       make: String!
@@ -23,7 +23,6 @@ const bikeSchema = gql`
       rear: Int
       upgrades: String
     ): Pkg!
-
     updateListing(
       bike_id: ID!
       make: String

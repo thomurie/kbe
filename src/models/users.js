@@ -1,7 +1,6 @@
+// EXTERNAL IMPORTS
 const { Sequelize, DataTypes, Model } = require("sequelize");
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
-
+// CONFIG
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
@@ -16,7 +15,7 @@ async function tc() {
 }
 
 tc();
-
+// MODEL
 class Users extends Model {}
 
 Users.init(

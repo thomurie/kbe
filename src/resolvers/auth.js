@@ -1,14 +1,10 @@
+// EXTERNAL IMPORTS
 const { ForbiddenError } = require("apollo-server");
-const { use } = require("chai");
 const { skip, combineResolvers } = require("graphql-resolvers");
 
-/**
- * TODO:
- * WRITE TESTS
- */
-
+// HELPER RESOLVERS
+// identifies if a user is authenticated
 const isAuth = (_, __, { user }) => {
-  console.log(user);
   return user
     ? skip
     : new ForbiddenError(
@@ -16,13 +12,14 @@ const isAuth = (_, __, { user }) => {
       );
 };
 
+// identifies if a user is the authenticated owner
 const isBikeUser = combineResolvers(
   isAuth,
-  async (_, { bike_id, url }, { models, user }) => {
+  async (_, { bike_id }, { models, user }) => {
     const bike = await models.Bikes.findOne({
       where: {
         bike_id: bike_id,
-        user_id: user.email,
+        user_id: user?.email,
       },
     });
 
@@ -32,22 +29,7 @@ const isBikeUser = combineResolvers(
   }
 );
 
-const isFavUser = combineResolvers(
-  isAuth,
-  async (_, { favorite_id }, { models, user }) => {
-    const { dataValues } = await models.Favorites.findOne({
-      where: {
-        favorite_id: favorite_id,
-      },
-    });
-
-    if (dataValues.user_id !== user.email)
-      throw new ForbiddenError("Not Authorized as owner");
-
-    return skip;
-  }
-);
-
+// identifies if a user is the authenticated owner of the user profile
 const isAuthUser = combineResolvers(
   isAuth,
   async ({ email }, _, { models, user }) => {
@@ -59,13 +41,14 @@ const isAuthUser = combineResolvers(
 
     const userId = userInfo.dataValues.email;
 
-    if (userId !== user.email)
+    if (userId !== user?.email)
       throw new ForbiddenError("Not Authorized as User");
 
     return skip;
   }
 );
 
+// identifies if a user is the authenticated owner of the user profile
 const isAuthUserArg = combineResolvers(
   isAuth,
   async (_, { email }, { models, user }) => {
@@ -74,8 +57,6 @@ const isAuthUserArg = combineResolvers(
         email: email,
       },
     });
-
-    console.log(userInfo);
 
     const userId = userInfo.dataValues.email;
 

@@ -1,3 +1,4 @@
+// CUSTOM ERROR MESSAGES
 class UserNotFoundError extends Error {
   constructor(message) {
     super(message); // (1)
