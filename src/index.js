@@ -1,16 +1,19 @@
 // EXTERNAL IMPORTS
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
+
 // LOCAL IMPORTS
 const typeDefs = require("./schema/index");
 const resolvers = require("./resolvers/index");
 const { sequelize, models } = require("./models/index");
+
 // CONFIG
-require("dotenv").config();
 const app = express();
 app.use(cors());
+
 // HELPER FUNCTIONS
 const validateUser = async (req) => {
   const token = req.headers["authorization"];
@@ -23,6 +26,7 @@ const validateUser = async (req) => {
     }
   }
 };
+
 // SERVER CONFIGURATION
 const server = new ApolloServer({
   typeDefs,

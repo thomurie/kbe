@@ -67,4 +67,4 @@ const isAuthUserArg = combineResolvers(
   }
 );
 
-module.exports = { isAuth, isAuthUser, isAuthUserArg, isBikeUser, isFavUser };
+module.exports = { isAuth, isAuthUser, isAuthUserArg, isBikeUser };

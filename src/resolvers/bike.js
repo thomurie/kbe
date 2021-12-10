@@ -1,6 +1,7 @@
 // EXTERNAL IMPORTS
 const { combineResolvers } = require("graphql-resolvers");
 const { AuthenticationError } = require("apollo-server");
+
 // LOCAL IMPORTS
 const { isAuth, isBikeUser } = require("./auth");
 const {
@@ -8,8 +9,10 @@ const {
   PhotoNotFoundError,
   UserNotFoundError,
 } = require("./customError");
+
 // CONFIG
 const { Op } = require("sequelize");
+
 // RESOLVERS
 const bikeResolvers = {
   Query: {
@@ -97,6 +100,22 @@ const bikeResolvers = {
           error: true,
           message: err.message,
         };
+      }
+    },
+    count: async (_, __, { models }) => {
+      try {
+        const bikesCount = await models.Bikes.count();
+        console.log(bikesCount);
+        if (!bikesCount)
+          throw new BikeNotFoundError(
+            "No bikes were found. We apologize for the inconvienence"
+          );
+
+        return bikesCount;
+      } catch (error) {
+        throw new BikeNotFoundError(
+          "The bike could not be found. We apologize for the inconvienence"
+        );
       }
     },
   },

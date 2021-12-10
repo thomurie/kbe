@@ -1,9 +1,11 @@
 // EXTERNAL IMPORTS
 const { Sequelize, DataTypes, Model } = require("sequelize");
+
 // CONFIG
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
+
 // MODEL
 class Bikes extends Model {}
 

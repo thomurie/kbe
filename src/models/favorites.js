@@ -1,12 +1,15 @@
 // EXTERNAL IMPORTS
 const { Sequelize, DataTypes, Model } = require("sequelize");
+
 // LOCAL IMPORTS
 const Bikes = require("./bikes");
 const Users = require("./users");
+
 // CONFIG
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
+
 // MODEL
 class Favorites extends Model {}
 

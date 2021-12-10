@@ -1,10 +1,11 @@
 // EXTERNAL IMPORTS
 const { Sequelize, DataTypes, Model } = require("sequelize");
+
 // CONFIG
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
 });
-
+// TEXT CONNECTION TO SQL DATABASE
 async function tc() {
   try {
     await sequelize.authenticate();
@@ -13,8 +14,8 @@ async function tc() {
     console.error("Unable to connect to the database:", error);
   }
 }
-
 tc();
+
 // MODEL
 class Users extends Model {}
 
@@ -80,13 +81,5 @@ Users.init(
     updatedAt: "updatedat",
   }
 );
-
-Users.loginUser = async (email) => {
-  const user = await Users.findOne({
-    where: { email: email },
-  });
-
-  return user;
-};
 
 module.exports = Users;

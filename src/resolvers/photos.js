@@ -1,15 +1,18 @@
 // EXTERNAL IMPORTS
 const cloudinary = require("cloudinary");
 const { combineResolvers } = require("graphql-resolvers");
+
 // LOCAL IMPORTS
 const { isBikeUser } = require("./auth");
 const { PhotoNotFoundError } = require("./customError");
+
 // CONFIG
 cloudinary.config({
   cloud_name: "knobbybikeexch",
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
+
 // RESOLVERS
 const photosResolvers = {
   Query: {

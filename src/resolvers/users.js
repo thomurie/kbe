@@ -3,11 +3,14 @@ const jwt = require("jsonwebtoken");
 const { AuthenticationError, UserInputError } = require("apollo-server");
 const { combineResolvers } = require("graphql-resolvers");
 const bcrypt = require("bcrypt");
+
 // LOCAL IMPORTS
 const { isAuth, isAuthUserArg } = require("./auth");
 const { UserNotFoundError } = require("./customError");
+
 // CONFIG
 const saltRounds = 10;
+
 // HELPER FUNCTIONS
 const hashPassword = async (plainTextPwd) => {
   return await bcrypt.hash(plainTextPwd, saltRounds);
@@ -30,6 +33,7 @@ const createToken = async (user, secret, expiresIn) => {
     { expiresIn }
   );
 };
+
 // RESOLVERS
 const userResolvers = {
   Query: {

@@ -1,5 +1,6 @@
 // EXTERNAL IMPORTS
 const { gql } = require("apollo-server");
+
 // GRAPHQL PHOTOS SCHEMA
 const photoSchema = gql`
   extend type Query {
