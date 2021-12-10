@@ -44,7 +44,7 @@ const server = new ApolloServer({
 // INITALIZE SERVER ON NPM START
 server.start().then(() => server.applyMiddleware({ app, path: "/graphql" }));
 sequelize.sync({ alter: true }).then(async () => {
-  await app.listen(8000, () => {
+  await app.listen(process.env.PORT, () => {
     console.log(`Server is running on port 8000`);
   });
 });
