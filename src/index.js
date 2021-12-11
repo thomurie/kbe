@@ -1,9 +1,9 @@
 // EXTERNAL IMPORTS
-require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
+require("dotenv").config();
 
 // LOCAL IMPORTS
 const typeDefs = require("./schema/index");

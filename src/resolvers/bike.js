@@ -105,7 +105,6 @@ const bikeResolvers = {
     count: async (_, __, { models }) => {
       try {
         const bikesCount = await models.Bikes.count();
-        console.log(bikesCount);
         if (!bikesCount)
           throw new BikeNotFoundError(
             "No bikes were found. We apologize for the inconvienence"
