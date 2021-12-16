@@ -49,9 +49,7 @@ const bikeResolvers = {
 
         return allBikes.map((b) => b.dataValues);
       } catch (error) {
-        throw new BikeNotFoundError(
-          "The bike could not be found. We apologize for the inconvienence"
-        );
+        return error;
       }
     },
 
@@ -96,10 +94,9 @@ const bikeResolvers = {
           bike: results.dataValues,
         };
       } catch (err) {
-        return {
-          error: true,
-          message: err.message,
-        };
+        throw new BikeNotFoundError(
+          "The bike could not be found. We apologize for the inconvienence"
+        );
       }
     },
     count: async (_, __, { models }) => {
@@ -204,13 +201,10 @@ const bikeResolvers = {
             about,
             upgrades,
           };
-
           const bike = await models.Bikes.create(addBike);
 
           if (!bike)
-            throw new BikeNotFoundError(
-              "The bike could not be found. We apologize for the inconvienence"
-            );
+            throw new BikeNotFoundError("Error Adding Bike, Please try again.");
 
           return {
             error: false,
@@ -219,7 +213,6 @@ const bikeResolvers = {
             owner: true,
           };
         } catch (err) {
-          console.log(err);
           return {
             error: true,
             message: err.message,

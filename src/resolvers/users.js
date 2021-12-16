@@ -189,7 +189,7 @@ const userResolvers = {
         return {
           error: false,
           user,
-          token: createToken(user, secret, "5m"),
+          token: createToken(user, secret, "30m"),
         };
       } catch (err) {
         return {
@@ -315,7 +315,7 @@ const userResolvers = {
           return {
             error: true,
             message:
-              err.message ||
+              error.message ||
               "An unknown error occured, please try your request again",
           };
         }
