@@ -27,7 +27,7 @@ The advantage of being highly expandable is that the mountainbike industry is a 
 
 [GraphQL](https://graphql.org/) is used as the query language for this API. GraphQL offers many benefits over REST APIs.
 
-To start with, GraphQL is client driven. The server only has one endpoint. This endpoint is used by the client, in our case [Apollo](https://www.apollographql.com/) Client to retrieve specific data in one call. This single API call decreases load times, decreases code required for formating/destructuring data. Additionally GraphQL is significantly less error prone. Type checking, variable requirements, and requested data are all checked by the client before a call is made to the server. This creates a more dynamic app with better user feedback and user experience.
+To start with, GraphQL is client driven. The server only has one endpoint. This endpoint is used by the client, in our case [Apollo](https://www.apollographql.com/) Client to retrieve specific data in one call. This single API call decreases load times and decreases code required for formating/destructuring data. Additionally GraphQL is significantly less error prone. Type checking, variable requirements, and requested data are all checked by the client before a call is made to the server. This creates a more dynamic app with better user feedback and user experience.
 
 Because clients have the ability to dictate exactly what they need from the server, they receive that data in a predictable way. This is advantageous because every part of KBE requires different data. If a REST API was used multiple endpoints would need to be created causing multiple calls to the API, increased load times, decreased user experience and increased the amount of code required to sort through the retrieved data.
 
@@ -37,7 +37,7 @@ A word about security. In combination with GraphQl KBEDB uses JWT authentication
 
 KBE is built using [React](https://reactjs.org/) a declarative component based library.
 
-React was used for a number of reasons. First in accordance with our goal to be scalable, React is a great library for expanding on existing code because it uses reusable components. Reusable components means less code needs to be written and maintained. while still facilitating the ability to scale. New features can be created and integrated with ease.
+React was used for a number of reasons. First in accordance with our goal to be scalable, React is a great library for expanding on existing code because it uses reusable components. Reusable components means less code needs to be written and maintained while still facilitating the ability to scale. New features can be created and integrated without major modifications to existing code.
 
 For further information please see [Knobby Bike Exchange (Front-End)](https://github.com/thomurie/kbe_fe).
 
@@ -55,7 +55,7 @@ Additional features are currently under development. Future features aim to incr
 
 ### Styling:
 
-KBE uses [Chakra UI](https://chakra-ui.com/) to style the components. Chakra UI is a simple, modular and accessible component library that strictly follows WAI-ARIA standards for all components. Chakra UI allows KBE to be accessible, efficient, and easy to use. Additional accessibility features and tools are currently under development.
+KBE uses [Chakra UI](https://chakra-ui.com/) to style the components. Chakra UI is a simple, modular and accessible component library that strictly follows WAI-ARIA standards for all components. Chakra UI allows KBE to be accessible, efficient, and easy to use.
 
 For further information please see [Knobby Bike Exchange (Front-End)](https://github.com/thomurie/kbe_fe).
 
